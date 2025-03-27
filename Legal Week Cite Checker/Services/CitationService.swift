@@ -1,16 +1,29 @@
 import Foundation
 import SwiftData
 
+// A service that handles the validation of legal citations
+// This service coordinates between the UI and the CourtListener API,
+// managing the validation process and storing results in SwiftData
 @MainActor
 class CitationService: ObservableObject {
+    // The API client used to communicate with CourtListener
     private let api = CourtListenerAPI.shared
+    // The list of citations that have been validated
     @Published var citations: [Citation] = []
+    // The SwiftData model context used to save citations
     private let modelContext: ModelContext
     
+    // Creates a new CitationService with the given model context
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
     }
     
+    // Validates a piece of text containing legal citations
+    // This method:
+    // 1. Extracts potential citations from the text
+    // 2. Validates each citation against CourtListener
+    // 3. If a citation is invalid, tries to find the case by name
+    // 4. Stores all results in SwiftData
     func validateText(_ text: String) async throws {
         print("\n=== Starting Citation Validation ===")
         print("Input text: \(text)")
@@ -87,6 +100,8 @@ class CitationService: ObservableObject {
         print("\n=== Citation Validation Complete ===")
     }
     
+    // Extracts potential citations from a piece of text using regular expressions
+    // This looks for patterns like "347 U.S. 483" or "123 F.3d 456"
     private func extractCitations(from text: String) -> [String] {
         // Basic citation pattern matching
         // This can be enhanced with more sophisticated patterns
@@ -105,6 +120,8 @@ class CitationService: ObservableObject {
         return citations
     }
     
+    // Extracts a potential case name from a citation
+    // This is a simple implementation that looks for text before the citation
     private func extractCaseName(from text: String) -> String? {
         // Basic case name pattern matching
         // This can be enhanced with more sophisticated patterns
@@ -120,6 +137,7 @@ class CitationService: ObservableObject {
         return nil
     }
     
+    // Deletes a citation from the database
     func deleteCitation(_ citation: Citation) {
         modelContext.delete(citation)
         try? modelContext.save()
