@@ -32,6 +32,11 @@ struct ContentView: View {
     @State private var errorMessage = ""
     // Whether a validation operation is in progress
     @State private var isProcessing = false
+    // The file picker for importing documents
+    @State private var showingFilePicker = false
+    
+    // The types of files that can be imported
+    private let supportedFileTypes: [UTType] = [.pdf, .word, .docx, .plainText]
     
     // The main view body
     var body: some View {
@@ -74,10 +79,19 @@ struct ContentView: View {
             }
             .navigationTitle("Citation Checker")
             .toolbar {
-                // Button to manage the API token
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showingAPITokenView = true }) {
-                        Label("API Token", systemImage: "key")
+                    HStack {
+                        // Button to clear all results
+                        if !citations.isEmpty {
+                            Button(action: clearResults) {
+                                Label("Clear Results", systemImage: "trash")
+                            }
+                        }
+                        
+                        // Button to manage the API token
+                        Button(action: { showingAPITokenView = true }) {
+                            Label("API Token", systemImage: "key")
+                        }
                     }
                 }
             }
@@ -87,7 +101,7 @@ struct ContentView: View {
         // File picker for uploading documents
         .fileImporter(
             isPresented: $showingDocumentPicker,
-            allowedContentTypes: [.pdf, .plainText],
+            allowedContentTypes: supportedFileTypes,
             allowsMultipleSelection: false
         ) { result in
             switch result {
@@ -128,6 +142,8 @@ struct ContentView: View {
         isProcessing = true
         Task {
             do {
+                // Clear existing results before starting a new search
+                clearResults()
                 try await citationService.validateText(inputText)
             } catch {
                 showError(error.localizedDescription)
@@ -136,29 +152,19 @@ struct ContentView: View {
         }
     }
     
-    // Handles an imported file by reading its contents
-    private func handleImportedFile(_ file: URL) {
-        guard file.startAccessingSecurityScopedResource() else {
-            showError("Failed to access the selected file")
-            return
-        }
-        
-        defer { file.stopAccessingSecurityScopedResource() }
-        
-        do {
-            let text: String
-            if file.pathExtension.lowercased() == "pdf" {
-                // TODO: Implement PDF text extraction
-                showError("PDF support coming soon")
-                return
-            } else {
-                text = try String(contentsOf: file, encoding: .utf8)
+    // Handles the imported file
+    private func handleImportedFile(_ url: URL) {
+        Task {
+            do {
+                let text = try await DocumentParser.shared.parseDocument(at: url)
+                inputText = text
+            } catch DocumentParserError.unsupportedFileType {
+                showError("Unsupported file type. Please use PDF, DOC, DOCX, or TXT files.")
+            } catch DocumentParserError.parsingError(let message) {
+                showError("Error parsing document: \(message)")
+            } catch {
+                showError("Error reading file: \(error.localizedDescription)")
             }
-            
-            inputText = text
-            validateText()
-        } catch {
-            showError(error.localizedDescription)
         }
     }
     
@@ -167,6 +173,14 @@ struct ContentView: View {
         for index in offsets {
             citationService.deleteCitation(citations[index])
         }
+    }
+    
+    // Clears all results from the list
+    private func clearResults() {
+        for citation in citations {
+            modelContext.delete(citation)
+        }
+        try? modelContext.save()
     }
     
     // Shows an error alert with the given message

@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		88F876282D960B9B00A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 88F876272D960B9B00A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		887FBFEF2D94295E009F1766 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		887FBFDC2D94295D009F1766 /* Legal Week Cite Checker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Legal Week Cite Checker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		887FBFEE2D94295E009F1766 /* Legal Week Cite CheckerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Legal Week Cite CheckerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		887FBFF82D94295E009F1766 /* Legal Week Cite CheckerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Legal Week Cite CheckerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		88F876272D960B9B00A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = NYCLW2025CitationCheckerTermsOfUse.pdf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +80,7 @@
 		887FBFD32D94295D009F1766 = {
 			isa = PBXGroup;
 			children = (
+				88F876262D960B7100A729EC /* Resources */,
 				887FBFDE2D94295D009F1766 /* Legal Week Cite Checker */,
 				887FBFF12D94295E009F1766 /* Legal Week Cite CheckerTests */,
 				887FBFFB2D94295E009F1766 /* Legal Week Cite CheckerUITests */,
@@ -90,6 +96,14 @@
 				887FBFF82D94295E009F1766 /* Legal Week Cite CheckerUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		88F876262D960B7100A729EC /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				88F876272D960B9B00A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -212,6 +226,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88F876282D960B9B00A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

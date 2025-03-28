@@ -7,7 +7,9 @@ enum CourtListenerAPIError: Error {
     case invalidData         // The API returned data that couldn't be processed
     case unauthorized        // The API token is invalid or missing
     case rateLimitExceeded   // Too many requests to the API
+    case serverError(Int)    // The server returned an error with the given status code
     case unknown(Error)      // Any other error that might occur
+    case forbidden           // The API token is forbidden
 }
 
 // A service that handles all communication with the CourtListener API
@@ -88,14 +90,22 @@ actor CourtListenerAPI {
         }
     }
     
-    // Searches for a case by its name
-    func searchCaseName(_ caseName: String) async throws -> CaseSearchResponse {
-        print("\nSearching case name: \(caseName)")
+    // Searches for a case by name
+    func searchCaseName(_ caseName: String) async throws -> [CaseResult] {
+        print("Searching case name: \(caseName)")
         
-        let encodedName = caseName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? caseName
-        let request = try createRequest("search/?type=o&case_name=\(encodedName)")
+        let encodedCaseName = caseName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? caseName
+        let urlString = "\(baseURL)/search/?type=o&case_name=\(encodedCaseName)"
+        print("Search URL: \(urlString)")
         
-        print("Search URL: \(request.url?.absoluteString ?? "")")
+        guard let url = URL(string: urlString) else {
+            throw CourtListenerAPIError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Token \(apiToken ?? "")", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
@@ -108,17 +118,12 @@ actor CourtListenerAPI {
             print("Response data: \(responseString)")
         }
         
-        switch httpResponse.statusCode {
-        case 200:
-            let decodedResponse = try JSONDecoder().decode(CaseSearchResponse.self, from: data)
-            print("Decoded response: \(decodedResponse)")
-            return decodedResponse
-        case 401:
-            throw CourtListenerAPIError.unauthorized
-        case 429:
-            throw CourtListenerAPIError.rateLimitExceeded
-        default:
-            throw CourtListenerAPIError.invalidResponse
+        if httpResponse.statusCode == 200 {
+            let searchResponse = try JSONDecoder().decode(SearchResponse.self, from: data)
+            print("Found \(searchResponse.count) results")
+            return searchResponse.results
+        } else {
+            throw CourtListenerAPIError.serverError(httpResponse.statusCode)
         }
     }
     
@@ -150,6 +155,46 @@ actor CourtListenerAPI {
             throw CourtListenerAPIError.rateLimitExceeded
         default:
             throw CourtListenerAPIError.invalidResponse
+        }
+    }
+    
+    // Looks up citations in a blob of text using the citation-lookup endpoint
+    func lookupCitationsInText(_ text: String) async throws -> [CitationResponse] {
+        guard let url = URL(string: "\(baseURL)/citation-lookup/") else {
+            throw CourtListenerAPIError.invalidURL
+        }
+        
+        guard let token = apiToken else {
+            throw CourtListenerAPIError.unauthorized
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Token \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        
+        // Create the form data
+        let formData = "text=\(text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
+        request.httpBody = formData.data(using: .utf8)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw CourtListenerAPIError.invalidResponse
+        }
+        
+        switch httpResponse.statusCode {
+        case 200:
+            let decoder = JSONDecoder()
+            return try decoder.decode([CitationResponse].self, from: data)
+        case 401:
+            throw CourtListenerAPIError.unauthorized
+        case 403:
+            throw CourtListenerAPIError.forbidden
+        case 429:
+            throw CourtListenerAPIError.rateLimitExceeded
+        default:
+            throw CourtListenerAPIError.serverError(httpResponse.statusCode)
         }
     }
 }
@@ -200,30 +245,31 @@ struct CaseSearchResponse: Codable {
     }
 }
 
-// Represents a single case result from a search
+// Model for case search results
 struct CaseResult: Codable {
-    // The unique identifier for the case
-    let id: Int
-    // The name of the case
     let caseName: String
-    // The citation for the case
-    let citation: String
-    // The URL to view the case on CourtListener
+    let citation: [String]
     let absoluteUrl: String
-    // The cluster ID for the case
-    let clusterId: String
+    let clusterId: Int
+    let court: String
+    let dateFiled: String
     
     enum CodingKeys: String, CodingKey {
-        case id
-        case caseName = "case_name"
-        case citation
+        case caseName = "caseName"
+        case citation = "citation"
         case absoluteUrl = "absolute_url"
         case clusterId = "cluster_id"
+        case court = "court"
+        case dateFiled = "dateFiled"
     }
-    
-    var description: String {
-        return "ID: \(id), Case: \(caseName), Citation: \(citation)"
-    }
+}
+
+// Model for search response
+struct SearchResponse: Codable {
+    let count: Int
+    let next: String?
+    let previous: String?
+    let results: [CaseResult]
 }
 
 // Represents a cluster (case) in CourtListener

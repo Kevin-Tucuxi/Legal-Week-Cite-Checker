@@ -11,6 +11,8 @@ struct CitationResultView: View {
     @State private var showingOpinionText = false
     // Whether the web view sheet is shown
     @State private var showingWebView = false
+    // Whether the notes sheet is shown
+    @State private var showingNotes = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -39,7 +41,7 @@ struct CitationResultView: View {
                     .foregroundColor(.secondary)
             }
             
-            // Action buttons for viewing opinion and case
+            // Action buttons for viewing opinion, case, and notes
             HStack {
                 if citation.opinionText != nil {
                     Button(action: { showingOpinionText = true }) {
@@ -50,6 +52,12 @@ struct CitationResultView: View {
                 if citation.courtListenerUrl != nil {
                     Button(action: { showingWebView = true }) {
                         Label("View on CourtListener", systemImage: "link")
+                    }
+                }
+                
+                if citation.notes != nil {
+                    Button(action: { showingNotes = true }) {
+                        Label("View Details", systemImage: "info.circle")
                     }
                 }
             }
@@ -70,6 +78,12 @@ struct CitationResultView: View {
             if let urlString = citation.courtListenerUrl,
                let url = URL(string: urlString) {
                 SafariView(url: url)
+            }
+        }
+        // Sheet to display the notes
+        .sheet(isPresented: $showingNotes) {
+            if let notes = citation.notes {
+                NotesView(text: notes)
             }
         }
     }
@@ -130,6 +144,32 @@ struct OpinionTextView: View {
                     .padding()
             }
             .navigationTitle("Opinion Text")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+// A view that displays additional notes about a citation
+struct NotesView: View {
+    // The notes text to display
+    let text: String
+    // Environment variable to dismiss the sheet
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                Text(text)
+                    .padding()
+            }
+            .navigationTitle("Case Details")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

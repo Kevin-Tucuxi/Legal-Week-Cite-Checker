@@ -25,6 +25,8 @@ final class Citation {
     var timestamp: Date
     // The full text of the court's opinion
     var opinionText: String?
+    // Additional notes about the citation (e.g., multiple matches found)
+    var notes: String?
     
     // Creates a new Citation with the given text
     // The status fields start as .pending and are updated as validation occurs
@@ -38,7 +40,8 @@ final class Citation {
         clusterId: String? = nil,
         courtListenerUrl: String? = nil,
         timestamp: Date = Date(),
-        opinionText: String? = nil
+        opinionText: String? = nil,
+        notes: String? = nil
     ) {
         self.id = id
         self.originalText = originalText
@@ -50,6 +53,7 @@ final class Citation {
         self.courtListenerUrl = courtListenerUrl
         self.timestamp = timestamp
         self.opinionText = opinionText
+        self.notes = notes
     }
 }
 
