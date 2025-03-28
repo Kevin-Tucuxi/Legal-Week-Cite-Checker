@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		88F876282D960B9B00A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 88F876272D960B9B00A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf */; };
+		88F8762A2D962D1400A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 88F876292D962D1400A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,7 +31,7 @@
 		887FBFDC2D94295D009F1766 /* Legal Week Cite Checker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Legal Week Cite Checker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		887FBFEE2D94295E009F1766 /* Legal Week Cite CheckerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Legal Week Cite CheckerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		887FBFF82D94295E009F1766 /* Legal Week Cite CheckerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Legal Week Cite CheckerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		88F876272D960B9B00A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = NYCLW2025CitationCheckerTermsOfUse.pdf; sourceTree = "<group>"; };
+		88F876292D962D1400A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = NYCLW2025CitationCheckerTermsOfUse.pdf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -101,7 +101,7 @@
 		88F876262D960B7100A729EC /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				88F876272D960B9B00A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf */,
+				88F876292D962D1400A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -226,7 +226,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				88F876282D960B9B00A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf in Resources */,
+				88F8762A2D962D1400A729EC /* NYCLW2025CitationCheckerTermsOfUse.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
