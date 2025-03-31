@@ -26,10 +26,6 @@ struct APITokenView: View {
                     }
                 }
             }
-            
-            Section(header: Text("About"), footer: Text("You need a CourtListener API token to use this app. You can get one by visiting https://www.courtlistener.com/help/api/")) {
-                Link("Get API Token", destination: URL(string: "https://www.courtlistener.com/help/api/")!)
-            }
         }
         .alert("API Token", isPresented: $showingAlert) {
             Button("OK", role: .cancel) { }
